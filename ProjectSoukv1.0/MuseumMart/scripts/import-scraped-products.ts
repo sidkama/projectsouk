@@ -1,0 +1,293 @@
+#!/usr/bin/env tsx
+
+import { storage } from '../server/storage';
+import type { InsertMuseum, InsertProduct } from '../shared/schema';
+
+const scrapedProducts = [
+  {
+    "name": "Warhol Campbell's Soup T-Shirt",
+    "description": "Cotton t-shirt featuring Andy Warhol's iconic Campbell's Soup Can artwork",
+    "shortDescription": "Warhol Campbell's Soup T-Shirt",
+    "price": "29.99",
+    "currency": "USD",
+    "imageUrl": "https://images.unsplash.com/photo-157025780920227?w=400",
+    "material": null,
+    "countryOfOrigin": "USA",
+    "inStock": true,
+    "stockQuantity": 39,
+    "featured": false,
+    "category": "clothing",
+    "museumName": "Modern Art Museum",
+    "museumLocation": "New York",
+    "sourceUrl": "https://example.com/modern-art-museum/products"
+  },
+  {
+    "name": "Abstract Expressionism Art Book",
+    "description": "Comprehensive guide to Abstract Expressionist movement with 200+ color reproductions",
+    "shortDescription": "Abstract Expressionism Art Book",
+    "price": "45.00",
+    "currency": "USD",
+    "imageUrl": "https://images.unsplash.com/photo-135464880308064?w=400",
+    "material": null,
+    "countryOfOrigin": "USA",
+    "inStock": true,
+    "stockQuantity": 31,
+    "featured": false,
+    "category": "books",
+    "museumName": "Modern Art Museum",
+    "museumLocation": "New York",
+    "sourceUrl": "https://example.com/modern-art-museum/products"
+  },
+  {
+    "name": "Pollock Drip Painting Tote Bag",
+    "description": "Canvas tote bag inspired by Jackson Pollock's drip painting technique",
+    "shortDescription": "Pollock Drip Painting Tote Bag",
+    "price": "24.95",
+    "currency": "USD",
+    "imageUrl": "https://images.unsplash.com/photo-409664666159354?w=400",
+    "material": null,
+    "countryOfOrigin": "USA",
+    "inStock": true,
+    "stockQuantity": 49,
+    "featured": false,
+    "category": "art",
+    "museumName": "Modern Art Museum",
+    "museumLocation": "New York",
+    "sourceUrl": "https://example.com/modern-art-museum/products"
+  },
+  {
+    "name": "Mondrian Grid Puzzle 500pc",
+    "description": "500-piece jigsaw puzzle featuring Piet Mondrian's geometric compositions",
+    "shortDescription": "Mondrian Grid Puzzle 500pc",
+    "price": "18.99",
+    "currency": "USD",
+    "imageUrl": "https://images.unsplash.com/photo-658570229382531?w=400",
+    "material": null,
+    "countryOfOrigin": "USA",
+    "inStock": true,
+    "stockQuantity": 49,
+    "featured": false,
+    "category": "toys",
+    "museumName": "Modern Art Museum",
+    "museumLocation": "New York",
+    "sourceUrl": "https://example.com/modern-art-museum/products"
+  },
+  {
+    "name": "Dinosaur Fossil Replica Necklace",
+    "description": "Sterling silver necklace with miniature T-Rex fossil pendant",
+    "shortDescription": "Dinosaur Fossil Replica Necklace",
+    "price": "34.99",
+    "currency": "GBP",
+    "imageUrl": "https://images.unsplash.com/photo-641349274300356?w=400",
+    "material": null,
+    "countryOfOrigin": "UK",
+    "inStock": true,
+    "stockQuantity": 70,
+    "featured": true,
+    "category": "jewelry",
+    "museumName": "Natural History Museum",
+    "museumLocation": "London",
+    "sourceUrl": "https://example.com/natural-history-museum/products"
+  },
+  {
+    "name": "Darwin's Origin of Species First Edition Print",
+    "description": "Museum-quality reproduction of Darwin's groundbreaking work title page",
+    "shortDescription": "Darwin's Origin of Species First",
+    "price": "89.00",
+    "currency": "GBP",
+    "imageUrl": "https://images.unsplash.com/photo-774924899891397?w=400",
+    "material": null,
+    "countryOfOrigin": "UK",
+    "inStock": true,
+    "stockQuantity": 8,
+    "featured": true,
+    "category": "art",
+    "museumName": "Natural History Museum",
+    "museumLocation": "London",
+    "sourceUrl": "https://example.com/natural-history-museum/products"
+  },
+  {
+    "name": "Mineral Collection Specimen Set",
+    "description": "Educational collection of 12 authentic mineral specimens with identification guide",
+    "shortDescription": "Mineral Collection Specimen Set",
+    "price": "56.50",
+    "currency": "GBP",
+    "imageUrl": "https://images.unsplash.com/photo-2881293050429?w=400",
+    "material": null,
+    "countryOfOrigin": "UK",
+    "inStock": true,
+    "stockQuantity": 76,
+    "featured": false,
+    "category": "books",
+    "museumName": "Natural History Museum",
+    "museumLocation": "London",
+    "sourceUrl": "https://example.com/natural-history-museum/products"
+  },
+  {
+    "name": "Butterfly Migration Silk Scarf",
+    "description": "Luxurious silk scarf depicting monarch butterfly migration patterns",
+    "shortDescription": "Butterfly Migration Silk Scarf",
+    "price": "72.00",
+    "currency": "GBP",
+    "imageUrl": "https://images.unsplash.com/photo-480620435653588?w=400",
+    "material": null,
+    "countryOfOrigin": "UK",
+    "inStock": true,
+    "stockQuantity": 20,
+    "featured": false,
+    "category": "clothing",
+    "museumName": "Natural History Museum",
+    "museumLocation": "London",
+    "sourceUrl": "https://example.com/natural-history-museum/products"
+  },
+  {
+    "name": "Ancient Greek Amphora Reproduction",
+    "description": "Hand-crafted ceramic reproduction of 5th century BC amphora with geometric patterns",
+    "shortDescription": "Ancient Greek Amphora Reproduction",
+    "price": "125.00",
+    "currency": "EUR",
+    "imageUrl": "https://images.unsplash.com/photo-205510243649750?w=400",
+    "material": null,
+    "countryOfOrigin": "Greece",
+    "inStock": true,
+    "stockQuantity": 47,
+    "featured": false,
+    "category": "souvenirs",
+    "museumName": "Archaeological Museum",
+    "museumLocation": "Athens",
+    "sourceUrl": "https://example.com/archaeological-museum/products"
+  },
+  {
+    "name": "Parthenon Marble Frieze Print",
+    "description": "High-resolution print of Parthenon marble frieze on archival paper",
+    "shortDescription": "Parthenon Marble Frieze Print",
+    "price": "65.00",
+    "currency": "EUR",
+    "imageUrl": "https://images.unsplash.com/photo-691970451424297?w=400",
+    "material": null,
+    "countryOfOrigin": "Greece",
+    "inStock": true,
+    "stockQuantity": 66,
+    "featured": true,
+    "category": "art",
+    "museumName": "Archaeological Museum",
+    "museumLocation": "Athens",
+    "sourceUrl": "https://example.com/archaeological-museum/products"
+  },
+  {
+    "name": "Greek Mythology Children's Book",
+    "description": "Illustrated children's book featuring classic Greek myths and legends",
+    "shortDescription": "Greek Mythology Children's Book",
+    "price": "22.95",
+    "currency": "EUR",
+    "imageUrl": "https://images.unsplash.com/photo-297387909928237?w=400",
+    "material": null,
+    "countryOfOrigin": "Greece",
+    "inStock": true,
+    "stockQuantity": 36,
+    "featured": false,
+    "category": "books",
+    "museumName": "Archaeological Museum",
+    "museumLocation": "Athens",
+    "sourceUrl": "https://example.com/archaeological-museum/products"
+  },
+  {
+    "name": "Ancient Coin Replica Set",
+    "description": "Museum-quality replicas of ancient Greek drachma and tetradrachm coins",
+    "shortDescription": "Ancient Coin Replica Set",
+    "price": "48.00",
+    "currency": "EUR",
+    "imageUrl": "https://images.unsplash.com/photo-806724648675748?w=400",
+    "material": null,
+    "countryOfOrigin": "Greece",
+    "inStock": true,
+    "stockQuantity": 9,
+    "featured": false,
+    "category": "souvenirs",
+    "museumName": "Archaeological Museum",
+    "museumLocation": "Athens",
+    "sourceUrl": "https://example.com/archaeological-museum/products"
+  }
+];
+
+async function importScrapedProducts() {
+  console.log('Starting import of scraped museum products...');
+
+  // Group products by museum
+  const museumGroups = scrapedProducts.reduce((acc, product) => {
+    if (!acc[product.museumName]) {
+      acc[product.museumName] = [];
+    }
+    acc[product.museumName].push(product);
+    return acc;
+  }, {} as Record<string, typeof scrapedProducts>);
+
+  // Get existing categories
+  const categories = await storage.getCategories();
+  const categoryMap = new Map(categories.map(c => [c.slug, c.id]));
+
+  for (const [museumName, products] of Object.entries(museumGroups)) {
+    try {
+      console.log(`\nProcessing ${museumName}...`);
+      
+      // Create museum
+      const sampleProduct = products[0];
+      const museum: InsertMuseum = {
+        name: sampleProduct.museumName,
+        location: sampleProduct.museumLocation,
+        country: sampleProduct.countryOfOrigin,
+        description: `Official merchandise from ${sampleProduct.museumName}`,
+        imageUrl: null,
+        website: null
+      };
+
+      const createdMuseum = await storage.createMuseum(museum);
+      console.log(`✓ Created museum: ${createdMuseum.name}`);
+
+      // Import products
+      for (const productData of products) {
+        try {
+          // Map category or default to souvenirs
+          const categoryId = categoryMap.get(productData.category) || 
+                           categoryMap.get('souvenirs') || 
+                           3; // fallback ID
+
+          const product: InsertProduct = {
+            name: productData.name,
+            description: productData.description,
+            shortDescription: productData.shortDescription,
+            price: productData.price,
+            currency: productData.currency,
+            imageUrl: productData.imageUrl,
+            museumId: createdMuseum.id,
+            categoryId,
+            material: productData.material,
+            countryOfOrigin: productData.countryOfOrigin,
+            inStock: productData.inStock,
+            stockQuantity: productData.stockQuantity,
+            featured: productData.featured
+          };
+
+          await storage.createProduct(product);
+          console.log(`  ✓ Imported: ${product.name}`);
+        } catch (error) {
+          console.error(`  ✗ Failed to import ${productData.name}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to process museum ${museumName}:`, error);
+    }
+  }
+
+  console.log('\nImport completed!');
+}
+
+// Check if this file is being run directly
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+
+if (process.argv[1] === __filename) {
+  importScrapedProducts().catch(console.error);
+}
+
+export { importScrapedProducts };
